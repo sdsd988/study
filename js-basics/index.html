@@ -1,0 +1,626 @@
+<title>자바스크립트 기초 노트</title>
+
+<style>
+/* 레이아웃: 좌측 고정 목차 + 우측 본문. 각 개념 섹션은 설명/코드 2단 구성(모바일에서 1단으로 스택). */
+:root {
+  --bg: #f6f7f5;
+  --surface: #ffffff;
+  --fg: #1b1f23;
+  --muted: #5b6470;
+  --border: #e2e5e1;
+  --accent: #2f6f5e;
+  --accent-soft: #e4efe9;
+  --code-bg: #11161c;
+  --code-fg: #d7e0e8;
+  --code-accent: #7fd9b6;
+  color-scheme: light;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #14171a;
+    --surface: #1c2024;
+    --fg: #e9ece9;
+    --muted: #9aa3a0;
+    --border: #2d3236;
+    --accent: #6fc9ae;
+    --accent-soft: #223029;
+    --code-bg: #0b0f13;
+    --code-fg: #d7e0e8;
+    --code-accent: #7fd9b6;
+    color-scheme: dark;
+  }
+}
+
+:root[data-theme="dark"] {
+  --bg: #14171a;
+  --surface: #1c2024;
+  --fg: #e9ece9;
+  --muted: #9aa3a0;
+  --border: #2d3236;
+  --accent: #6fc9ae;
+  --accent-soft: #223029;
+  --code-bg: #0b0f13;
+  --code-fg: #d7e0e8;
+  --code-accent: #7fd9b6;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--fg);
+  font-family: "Source Sans 3", "Apple SD Gothic Neo", sans-serif;
+  font-size: 15.5px;
+  line-height: 1.65;
+  padding-inline: 16px;
+  padding-block: max(32px, env(safe-area-inset-top, 0px)) 64px;
+}
+
+.page {
+  max-width: 1040px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 200px minmax(0, 1fr);
+  gap: 36px;
+  align-items: start;
+}
+
+@media (max-width: 760px) {
+  .page { grid-template-columns: 1fr; }
+}
+
+header.hero {
+  grid-column: 1 / -1;
+  padding-bottom: 20px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 4px;
+}
+
+.eyebrow {
+  display: inline-block;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 11.5px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--accent);
+  background: var(--accent-soft);
+  padding: 4px 10px;
+  border-radius: 999px;
+  margin-bottom: 14px;
+}
+
+h1 {
+  font-family: "Fraunces", Georgia, serif;
+  font-size: clamp(28px, 4vw, 40px);
+  font-weight: 600;
+  margin: 0 0 10px;
+  text-wrap: balance;
+  letter-spacing: -0.01em;
+}
+
+.hero p {
+  color: var(--muted);
+  max-width: 640px;
+  margin: 0;
+  font-size: 16px;
+}
+
+nav.toc {
+  position: sticky;
+  top: calc(env(safe-area-inset-top, 0px) + 20px);
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-size: 13.5px;
+}
+
+@media (max-width: 760px) {
+  nav.toc {
+    position: static;
+    flex-direction: row;
+    overflow-x: auto;
+    gap: 6px;
+    padding-bottom: 10px;
+    margin-bottom: 8px;
+    border-bottom: 1px solid var(--border);
+  }
+  nav.toc a { white-space: nowrap; }
+}
+
+nav.toc .label {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+
+@media (max-width: 760px) {
+  nav.toc .label { display: none; }
+}
+
+nav.toc a {
+  color: var(--muted);
+  text-decoration: none;
+  padding: 6px 10px;
+  border-radius: 8px;
+  border-left: 2px solid transparent;
+}
+
+@media (max-width: 760px) {
+  nav.toc a { border-left: none; border: 1px solid var(--border); border-radius: 999px; }
+}
+
+nav.toc a:hover,
+nav.toc a:focus-visible {
+  color: var(--fg);
+  background: var(--surface);
+  border-left-color: var(--accent);
+  outline: none;
+}
+
+main { min-width: 0; display: flex; flex-direction: column; gap: 28px; }
+
+section.concept {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 22px;
+  scroll-margin-top: 80px;
+}
+
+.concept-head {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 10px;
+}
+
+.concept-num {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 12px;
+  color: var(--accent);
+}
+
+h2 {
+  font-family: "Fraunces", Georgia, serif;
+  font-size: 19px;
+  font-weight: 600;
+  margin: 0;
+}
+
+.concept p { margin: 0 0 12px; color: var(--fg); }
+.concept p.muted { color: var(--muted); font-size: 14px; }
+
+.concept-body {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 18px;
+  align-items: start;
+}
+
+@media (max-width: 640px) {
+  .concept-body { grid-template-columns: 1fr; }
+}
+
+pre {
+  margin: 0;
+  background: var(--code-bg);
+  color: var(--code-fg);
+  border-radius: 10px;
+  padding: 14px 16px;
+  overflow-x: auto;
+  font-size: 13px;
+  min-width: 0;
+}
+
+code {
+  font-family: "JetBrains Mono", monospace;
+}
+
+pre .c { color: var(--code-accent); } /* 주석 강조용 */
+
+.inline-code {
+  font-family: "JetBrains Mono", monospace;
+  background: var(--accent-soft);
+  color: var(--accent);
+  padding: 1px 6px;
+  border-radius: 5px;
+  font-size: 0.92em;
+}
+
+ul.points { margin: 0 0 12px; padding-left: 18px; color: var(--fg); }
+ul.points li { margin-bottom: 6px; }
+ul.points li::marker { color: var(--accent); }
+
+/* 적용 섹션 */
+.apply-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13.5px;
+  min-width: 560px;
+}
+
+.apply-table-wrap { overflow-x: auto; border-radius: 10px; border: 1px solid var(--border); }
+
+.apply-table th, .apply-table td {
+  text-align: left;
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--border);
+  vertical-align: top;
+}
+
+.apply-table th {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--muted);
+  background: var(--accent-soft);
+}
+
+.apply-table tr:last-child td { border-bottom: none; }
+
+.tag {
+  display: inline-block;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 11px;
+  background: var(--accent-soft);
+  color: var(--accent);
+  padding: 2px 7px;
+  border-radius: 6px;
+}
+
+.todo-box {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.todo-box .step {
+  display: flex;
+  gap: 10px;
+  padding: 12px 14px;
+  border: 1px dashed var(--border);
+  border-radius: 10px;
+}
+
+.todo-box .step b { color: var(--accent); font-family: "JetBrains Mono", monospace; font-size: 12px; }
+
+footer.note {
+  margin-top: 10px;
+  color: var(--muted);
+  font-size: 13px;
+  border-top: 1px solid var(--border);
+  padding-top: 16px;
+}
+</style>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Source+Sans+3:wght@400;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+<div class="page">
+  <header class="hero">
+    <span class="eyebrow">JavaScript Fundamentals</span>
+    <h1>바닐라 JS 기초 노트 — 할일 앱으로 익히기</h1>
+    <p>변수, 함수, 배열 메서드, DOM, 이벤트까지 — 실제로 우리가 만든 <span class="inline-code">app.js</span>에 이미 쓰인 코드로 핵심 개념을 정리했습니다. 각 섹션 끝에는 프로젝트에 바로 적용할 수 있는 개선 아이디어를 붙였습니다.</p>
+  </header>
+
+  <nav class="toc" aria-label="목차">
+    <span class="label">목차</span>
+    <a href="#vars">1. 변수 선언</a>
+    <a href="#types">2. 자료형 · 템플릿 리터럴</a>
+    <a href="#functions">3. 함수와 화살표 함수</a>
+    <a href="#control">4. 조건문 · 삼항연산자</a>
+    <a href="#arrays">5. 배열 메서드</a>
+    <a href="#objects">6. 객체 · 스프레드</a>
+    <a href="#destructuring">7. 구조분해 할당</a>
+    <a href="#dom">8. DOM 조작</a>
+    <a href="#events">9. 이벤트 처리</a>
+    <a href="#modules">10. 모듈화</a>
+    <a href="#apply">프로젝트 적용표</a>
+  </nav>
+
+  <main>
+
+    <section class="concept" id="vars">
+      <div class="concept-head">
+        <span class="concept-num">01</span>
+        <h2>변수 선언 — let · const · var</h2>
+      </div>
+      <p><span class="inline-code">const</span>는 재할당이 불가능한 값, <span class="inline-code">let</span>은 재할당이 필요한 값에 쓰고, <span class="inline-code">var</span>는 함수 스코프라 블록 스코프를 가진 <span class="inline-code">let</span>/<span class="inline-code">const</span>로 대체하는 것이 요즘 표준입니다.</p>
+      <div class="concept-body">
+        <ul class="points">
+          <li><span class="inline-code">const</span>: DOM 참조, 변경되지 않는 배열/객체의 "바인딩"에 사용</li>
+          <li><span class="inline-code">let</span>: 값이 바뀌는 카운터, 가변 상태에 사용</li>
+          <li>객체·배열은 <span class="inline-code">const</span>여도 내부 속성은 바꿀 수 있음 (재할당만 금지)</li>
+        </ul>
+        <pre><code><span class="c">// app.js 상단</span>
+let todos = [];
+let nextId = 1;
+
+<span class="c">// DOM 참조는 바뀌지 않으므로 const</span>
+const form = document.getElementById("todo-form");
+const input = document.getElementById("todo-input");</code></pre>
+      </div>
+    </section>
+
+    <section class="concept" id="types">
+      <div class="concept-head">
+        <span class="concept-num">02</span>
+        <h2>자료형과 템플릿 리터럴</h2>
+      </div>
+      <p>자바스크립트의 기본 타입은 문자열, 숫자, 불리언, undefined/null, 객체(배열 포함)입니다. 문자열 안에 변수를 넣을 때는 <span class="inline-code">+</span> 연결 대신 백틱(`)과 <span class="inline-code">${}</span>를 쓰는 템플릿 리터럴이 더 읽기 쉽습니다.</p>
+      <div class="concept-body">
+        <ul class="points">
+          <li>문자열: <span class="inline-code">"todo"</span>, 숫자: <span class="inline-code">1</span>, 불리언: <span class="inline-code">true/false</span></li>
+          <li>배열과 객체는 참조 타입 — 변수에는 "위치"가 저장됨</li>
+          <li>템플릿 리터럴은 줄바꿈과 표현식 삽입이 자유로움</li>
+        </ul>
+        <pre><code><span class="c">// app.js의 render() 함수</span>
+const remaining = todos.filter(
+  (todo) => !todo.completed
+).length;
+
+remainingCount.textContent =
+  `남은 할 일: ${remaining}개`;</code></pre>
+      </div>
+    </section>
+
+    <section class="concept" id="functions">
+      <div class="concept-head">
+        <span class="concept-num">03</span>
+        <h2>함수 선언식과 화살표 함수</h2>
+      </div>
+      <p>이름이 있고 재사용되는 로직은 함수 선언식(<span class="inline-code">function name() {}</span>)으로, 콜백처럼 짧고 한 번 쓰고 버리는 함수는 화살표 함수로 쓰면 코드 성격이 명확해집니다. 화살표 함수는 자신만의 <span class="inline-code">this</span>를 만들지 않는다는 차이도 있습니다.</p>
+      <div class="concept-body">
+        <ul class="points">
+          <li>함수 선언식: 호이스팅되어 파일 어디서든 먼저 호출 가능</li>
+          <li>화살표 함수: <span class="inline-code">(매개변수) => 표현식</span> 형태로 짧게 작성</li>
+          <li>콜백(이벤트 핸들러, map/filter 등)에는 화살표 함수가 자연스러움</li>
+        </ul>
+        <pre><code><span class="c">// 이름이 있는 로직 -&gt; 함수 선언식</span>
+function addTodo(text) {
+  const trimmed = text.trim();
+  if (!trimmed) return;
+  todos.push({ id: nextId++, text: trimmed, completed: false });
+  render();
+}
+
+<span class="c">// 짧은 콜백 -&gt; 화살표 함수</span>
+text.addEventListener("click", () => toggleTodo(todo.id));</code></pre>
+      </div>
+    </section>
+
+    <section class="concept" id="control">
+      <div class="concept-head">
+        <span class="concept-num">04</span>
+        <h2>조건문과 삼항 연산자</h2>
+      </div>
+      <p><span class="inline-code">if</span>는 "실행할지 말지"를 결정하는 문장, 삼항 연산자(<span class="inline-code">조건 ? A : B</span>)는 "어떤 값을 쓸지"를 결정하는 표현식입니다. 값을 바로 할당하거나 문자열에 끼워 넣을 때는 삼항 연산자가 더 간결합니다.</p>
+      <div class="concept-body">
+        <ul class="points">
+          <li>early return 패턴: 조건이 안 맞으면 즉시 <span class="inline-code">return</span></li>
+          <li>삼항 연산자는 클래스명·텍스트처럼 "값"이 필요할 때 사용</li>
+        </ul>
+        <pre><code><span class="c">// early return — 빈 문자열이면 추가하지 않음</span>
+if (!trimmed) return;
+
+<span class="c">// 삼항 연산자로 클래스명 조합</span>
+item.className =
+  "todo-item" + (todo.completed ? " completed" : "");</code></pre>
+      </div>
+    </section>
+
+    <section class="concept" id="arrays">
+      <div class="concept-head">
+        <span class="concept-num">05</span>
+        <h2>배열 메서드 — map · filter · forEach · push</h2>
+      </div>
+      <p>배열을 다룰 때 <span class="inline-code">for</span>문 대신 목적이 드러나는 메서드를 쓰면 코드 의도가 명확해집니다. <span class="inline-code">map</span>은 변환, <span class="inline-code">filter</span>는 선택, <span class="inline-code">forEach</span>는 순회(부수효과), <span class="inline-code">push</span>는 추가입니다.</p>
+      <div class="concept-body">
+        <ul class="points">
+          <li><span class="inline-code">map</span>: 새 배열을 "같은 길이"로 변환해서 반환</li>
+          <li><span class="inline-code">filter</span>: 조건에 맞는 요소만 남긴 새 배열 반환</li>
+          <li><span class="inline-code">forEach</span>: 반환값 없이 각 요소마다 작업(화면에 렌더링 등) 수행</li>
+        </ul>
+        <pre><code><span class="c">// toggleTodo — map으로 완료 상태만 바꾼 새 배열 생성</span>
+todos = todos.map((todo) =>
+  todo.id === id ? { ...todo, completed: !todo.completed } : todo
+);
+
+<span class="c">// deleteTodo — filter로 해당 id만 제외</span>
+todos = todos.filter((todo) => todo.id !== id);
+
+<span class="c">// render — forEach로 각 todo를 화면에 그리기</span>
+todos.forEach((todo) => { /* li 생성 후 list.appendChild */ });</code></pre>
+      </div>
+    </section>
+
+    <section class="concept" id="objects">
+      <div class="concept-head">
+        <span class="concept-num">06</span>
+        <h2>객체와 스프레드 연산자</h2>
+      </div>
+      <p>객체는 <span class="inline-code">{ key: value }</span> 형태로 여러 속성을 하나로 묶습니다. 스프레드 연산자(<span class="inline-code">...</span>)는 기존 객체를 복사하면서 일부 속성만 덮어써, 원본을 직접 수정하지 않고 새 객체를 만들 수 있게 해줍니다.</p>
+      <div class="concept-body">
+        <ul class="points">
+          <li>원본을 직접 바꾸지 않는 방식을 "불변성(immutability)" 유지라고 함</li>
+          <li><span class="inline-code">{ ...todo, completed: !todo.completed }</span> = todo를 복사한 뒤 completed만 교체</li>
+        </ul>
+        <pre><code><span class="c">// 하나의 todo 객체</span>
+{ id: 1, text: "장보기", completed: false }
+
+<span class="c">// 스프레드로 복사 + 일부 속성만 변경</span>
+{ ...todo, completed: !todo.completed }
+<span class="c">// -&gt; { id: 1, text: "장보기", completed: true }</span></code></pre>
+      </div>
+    </section>
+
+    <section class="concept" id="destructuring">
+      <div class="concept-head">
+        <span class="concept-num">07</span>
+        <h2>구조분해 할당 (Destructuring)</h2>
+      </div>
+      <p>객체나 배열에서 필요한 값만 바로 꺼내 변수로 만드는 문법입니다. 지금 app.js는 <span class="inline-code">todo.text</span>, <span class="inline-code">todo.completed</span>처럼 매번 접근하는데, 구조분해를 쓰면 더 짧고 읽기 좋아집니다.</p>
+      <div class="concept-body">
+        <ul class="points">
+          <li>객체 구조분해: <span class="inline-code">const { text, completed } = todo;</span></li>
+          <li>함수 매개변수에서도 바로 구조분해 가능</li>
+        </ul>
+        <pre><code><span class="c">// 지금 방식</span>
+todos.forEach((todo) => {
+  item.className = todo.completed ? "completed" : "";
+  text.textContent = todo.text;
+});
+
+<span class="c">// 구조분해로 개선</span>
+todos.forEach(({ id, text: label, completed }) => {
+  item.className = completed ? "completed" : "";
+  text.textContent = label;
+});</code></pre>
+      </div>
+    </section>
+
+    <section class="concept" id="dom">
+      <div class="concept-head">
+        <span class="concept-num">08</span>
+        <h2>DOM 조작 — 요소 생성과 변경</h2>
+      </div>
+      <p>DOM(Document Object Model)은 HTML을 자바스크립트 객체로 다룰 수 있게 해주는 구조입니다. <span class="inline-code">createElement</span>로 새 요소를 만들고, <span class="inline-code">textContent</span>로 텍스트를 넣고, <span class="inline-code">appendChild</span>로 화면에 붙입니다.</p>
+      <div class="concept-body">
+        <ul class="points">
+          <li><span class="inline-code">getElementById</span>: 이미 있는 요소 찾기</li>
+          <li><span class="inline-code">createElement</span>: 새 요소 만들기 (아직 화면에는 없음)</li>
+          <li><span class="inline-code">appendChild</span>: 실제 화면 트리에 연결</li>
+        </ul>
+        <pre><code><span class="c">// render() 함수 중 리스트 아이템 생성 부분</span>
+const item = document.createElement("li");
+item.className = "todo-item";
+
+const text = document.createElement("span");
+text.textContent = todo.text;
+
+item.appendChild(text);
+list.appendChild(item);</code></pre>
+      </div>
+    </section>
+
+    <section class="concept" id="events">
+      <div class="concept-head">
+        <span class="concept-num">09</span>
+        <h2>이벤트 처리 — addEventListener</h2>
+      </div>
+      <p>사용자의 클릭, 입력, 제출 같은 동작에 반응하려면 <span class="inline-code">addEventListener</span>로 "이 요소에서 이 이벤트가 발생하면 이 함수를 실행하라"고 등록합니다. 폼 제출의 기본 동작(새로고침)을 막으려면 <span class="inline-code">preventDefault()</span>가 필요합니다.</p>
+      <div class="concept-body">
+        <ul class="points">
+          <li><span class="inline-code">submit</span>, <span class="inline-code">click</span> 등 이벤트 타입은 수십 종류</li>
+          <li>콜백 함수 안에서 <span class="inline-code">event</span> 객체로 상세 정보 접근</li>
+        </ul>
+        <pre><code><span class="c">// 폼 제출 시 새로고침 막고 addTodo 실행</span>
+form.addEventListener("submit", (e) => {
+  e.preventDefault();
+  addTodo(input.value);
+  input.value = "";
+});</code></pre>
+      </div>
+    </section>
+
+    <section class="concept" id="modules">
+      <div class="concept-head">
+        <span class="concept-num">10</span>
+        <h2>모듈화 — import / export</h2>
+      </div>
+      <p>지금은 app.js 하나에 모든 로직이 있지만, 코드가 커지면 기능별로 파일을 나누고 <span class="inline-code">export</span>/<span class="inline-code">import</span>로 연결할 수 있습니다. HTML에서는 <span class="inline-code">&lt;script type="module"&gt;</span>로 불러옵니다.</p>
+      <div class="concept-body">
+        <ul class="points">
+          <li><span class="inline-code">export function</span>: 다른 파일에서 쓸 수 있게 공개</li>
+          <li><span class="inline-code">import { ... } from "./파일.js"</span>: 가져오기</li>
+        </ul>
+        <pre><code><span class="c">// storage.js</span>
+export function saveTodos(todos) {
+  localStorage.setItem("todos", JSON.stringify(todos));
+}
+
+<span class="c">// app.js</span>
+import { saveTodos } from "./storage.js";</code></pre>
+      </div>
+    </section>
+
+    <section class="concept" id="apply">
+      <div class="concept-head">
+        <span class="concept-num">⟶</span>
+        <h2>우리 프로젝트에 적용하기</h2>
+      </div>
+      <p class="muted">위 개념들은 이미 <span class="inline-code">app.js</span>에 쓰이고 있습니다. 아래는 어디에 쓰였는지와, 더 다듬을 수 있는 지점입니다.</p>
+
+      <div class="apply-table-wrap">
+        <table class="apply-table">
+          <thead>
+            <tr>
+              <th>개념</th>
+              <th>현재 위치</th>
+              <th>개선 아이디어</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><span class="tag">let/const</span></td>
+              <td><span class="inline-code">todos</span>, <span class="inline-code">nextId</span></td>
+              <td>그대로 유지 — 이미 적절히 구분됨</td>
+            </tr>
+            <tr>
+              <td><span class="tag">map/filter</span></td>
+              <td><span class="inline-code">toggleTodo</span>, <span class="inline-code">deleteTodo</span></td>
+              <td>그대로 유지 — 불변성 있게 잘 작성됨</td>
+            </tr>
+            <tr>
+              <td><span class="tag">구조분해</span></td>
+              <td>미사용</td>
+              <td><span class="inline-code">render()</span>의 forEach 콜백에서 <span class="inline-code">{ id, text, completed }</span>로 구조분해하면 가독성 향상</td>
+            </tr>
+            <tr>
+              <td><span class="tag">클래스 조합</span></td>
+              <td><span class="inline-code">item.className = "..." + (...)</span></td>
+              <td><span class="inline-code">item.classList.toggle("completed", todo.completed)</span>로 교체하면 더 명확</td>
+            </tr>
+            <tr>
+              <td><span class="tag">이벤트 위임</span></td>
+              <td>매 렌더링마다 아이템별 <span class="inline-code">addEventListener</span></td>
+              <td><span class="inline-code">list</span> 하나에만 리스너를 달고 <span class="inline-code">e.target</span>으로 분기하면 메모리 낭비 방지</td>
+            </tr>
+            <tr>
+              <td><span class="tag">모듈화</span></td>
+              <td>app.js 한 파일</td>
+              <td><span class="inline-code">localStorage</span> 저장/불러오기를 <span class="inline-code">storage.js</span>로 분리해 새로고침해도 목록 유지</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="todo-box">
+        <div class="step">
+          <b>STEP 1</b>
+          <span><span class="inline-code">render()</span>의 forEach 콜백을 구조분해 문법으로 바꿔보기</span>
+        </div>
+        <div class="step">
+          <b>STEP 2</b>
+          <span><span class="inline-code">className</span> 문자열 조합을 <span class="inline-code">classList.toggle</span>로 교체</span>
+        </div>
+        <div class="step">
+          <b>STEP 3</b>
+          <span><span class="inline-code">addTodo</span>/<span class="inline-code">toggleTodo</span>/<span class="inline-code">deleteTodo</span> 호출 뒤 <span class="inline-code">localStorage</span>에 저장하고, 시작 시 불러오기</span>
+        </div>
+      </div>
+
+      <footer class="note">작은 할일 앱 하나에도 변수, 함수, 배열 메서드, DOM, 이벤트 다섯 가지 핵심 개념이 모두 들어 있습니다. 이 개념들이 익숙해지면 더 큰 프로젝트의 코드도 같은 패턴으로 읽힙니다.</footer>
+    </section>
+
+  </main>
+</div>
