@@ -73,6 +73,7 @@ function toggleTodo(id) {
 
 // 할 일 텍스트 클립보드 복사
 function copyTodo(text) {
+  if (!navigator.clipboard) return;
   navigator.clipboard.writeText(text).catch(() => {});
 }
 
