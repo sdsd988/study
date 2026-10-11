@@ -95,6 +95,20 @@ h1 {
   color: #aaa;
 }
 
+.todo-item .copy-btn {
+  border: none;
+  background: transparent;
+  color: #4a90e2;
+  font-size: 13px;
+  cursor: pointer;
+  padding: 4px 6px;
+  border-radius: 6px;
+}
+
+.todo-item .copy-btn:hover {
+  background: #eaf1fd;
+}
+
 .todo-item .delete-btn {
   border: none;
   background: transparent;

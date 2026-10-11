@@ -29,12 +29,18 @@ function render() {
     text.textContent = todo.text;
     text.addEventListener("click", () => toggleTodo(todo.id));
 
+    const copyBtn = document.createElement("button");
+    copyBtn.className = "copy-btn";
+    copyBtn.textContent = "복사";
+    copyBtn.addEventListener("click", () => copyTodo(todo.text));
+
     const deleteBtn = document.createElement("button");
     deleteBtn.className = "delete-btn";
     deleteBtn.textContent = "삭제";
     deleteBtn.addEventListener("click", () => deleteTodo(todo.id));
 
     item.appendChild(text);
+    item.appendChild(copyBtn);
     item.appendChild(deleteBtn);
     list.appendChild(item);
   });
@@ -63,6 +69,11 @@ function toggleTodo(id) {
     todo.id === id ? { ...todo, completed: !todo.completed } : todo
   );
   render();
+}
+
+// 할 일 텍스트 클립보드 복사
+function copyTodo(text) {
+  navigator.clipboard.writeText(text).catch(() => {});
 }
 
 // 할 일 삭제
